@@ -1,0 +1,32 @@
+services:
+  drupal:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DRUPAL_DB_HOST: db
+      DRUPAL_DB_NAME: drupal
+      DRUPAL_DB_USER: drupal
+      DRUPAL_DB_PASSWORD: drupal
+    depends_on:
+      - db
+    volumes:
+      # Mount files dir for local dev so uploads persist between restarts.
+      # (In AWS this is an EFS mount instead - see the deployment guide.)
+      - drupal-files:/var/www/html/web/sites/default/files
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: drupal
+      MYSQL_USER: drupal
+      MYSQL_PASSWORD: drupal
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - drupal-db:/var/lib/mysql
+
+volumes:
+  drupal-files:
+  drupal-db:
